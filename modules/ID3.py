@@ -42,7 +42,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     
     # Otherwise, pick_best_attribute returned an attribute, so we split
     else:
-        tree.decision_attrib = attr  # index of the attribute
+        tree.decision_attribute = attr  # index of the attribute
         tree.name = attribute_metadata[attr]["name"]
         tree.is_nominal = attribute_metadata[attr]["is_nominal"]
         tree.splitting_value = threshold  # Will be False if nominal
@@ -264,8 +264,8 @@ def gain_ratio_numeric(data_set, attribute, steps=1):
                 iv = -p * math.log(p, 2)
                 intrinsic_value += iv
 
-            info_gain = current_entropy - entropy_after
-            igr = info_gain / float(intrinsic_value) if intrinsic_value > 0 else 0
+        info_gain = current_entropy - entropy_after
+        igr = info_gain / float(intrinsic_value) if intrinsic_value > 0 else 0
 
         # Update max if necessary
         if igr > igr_max[0]:
@@ -305,6 +305,8 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
             t = False
         elif numerical_splits_count[i] > 0:
             igr, t = gain_ratio_numeric(data_set, i, steps=1)
+        else:
+            continue
         
         if igr > igr_max:
             igr_max = igr  # Update internal counter
@@ -386,7 +388,7 @@ if __name__ == "__main__":
     data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
     numerical_splits_count = [5, 5]
 
-    test = ID3(data_set, attribute_metadata, numerical_splits_count, 10)
+    test = ID3(data_set, attribute_metadata, numerical_splits_count, 0)
     print "\n"
     test.print_tree()
     # print "Passed tests for ID3"

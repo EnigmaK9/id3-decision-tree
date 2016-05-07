@@ -6,33 +6,32 @@ from operator import xor
 # so you can implement them as you choose or not implement them at all if you want to use a different
 # architecture for pruning.
 
-def prune_tree(tree, nodes, validation_examples, old_acc):
-    
-    while reduced_by >0:
-        reduction = []
-        for n in nodes:
-            if isinstance(n, TreeLeaf):
-                nodes.pop(nodes.index(n))
-                continue
-            else:
-                target_class = n.mode
-                n.toLeaf(target_class)
-                new_acc = tree_accuracy(validation_examples, tree)
-                diff = new_acc - old_acc
-                reduction.append(diff)
-                n.toFork()
-        if reduction != []:
-            max_red_at = reduction.index(max(reduction))
-            if isinstance(nodes[max_red_at], TreeFork):
-                nodes[max_red_at].toLeaf(nodes[max_red_at].mode)
-            nodes.pop(max_red_at)
-            reduced_by = max(reduction)
-            old_acc = tree_accuracy(validation_examples, tree)
-        else:
-            reduced_by = 0
+# def prune_tree(tree, nodes, validation_examples, old_acc):
+#     while reduced_by >0:
+#         reduction = []
+#         for n in nodes:
+#             if isinstance(n, TreeLeaf):
+#                 nodes.pop(nodes.index(n))
+#                 continue
+#             else:
+#                 target_class = n.mode
+#                 n.toLeaf(target_class)
+#                 new_acc = tree_accuracy(validation_examples, tree)
+#                 diff = new_acc - old_acc
+#                 reduction.append(diff)
+#                 n.toFork()
+#         if reduction != []:
+#             max_red_at = reduction.index(max(reduction))
+#             if isinstance(nodes[max_red_at], TreeFork):
+#                 nodes[max_red_at].toLeaf(nodes[max_red_at].mode)
+#             nodes.pop(max_red_at)
+#             reduced_by = max(reduction)
+#             old_acc = tree_accuracy(validation_examples, tree)
+#         else:
+#             reduced_by = 0
 
-    print "The new accuracy is: " + str(new_acc) + "%"
-    return [tree, new_acc]
+#     print "The new accuracy is: " + str(new_acc) + "%"
+#     return [tree, new_acc]
 
 
 def reduced_error_pruning(root, training_set, validation_set):
@@ -49,41 +48,45 @@ def reduced_error_pruning(root, training_set, validation_set):
         Node -- the improved root of the pruned decision tree
     """
 
-    # If root is a leaf, classify
-    if root.label is not None:
+    # # DFS the tree
+    # stack = []
+
+    # # If root is a leaf, classify
+    # if root.label is not None:
 
 
-    # Get list of children
-    if root.is_nominal:
-        # root.children is a dictionary
-        children = [val for val in root.children.values()]
-    else:
-        # root.children is a pair
-        children = root.children
+    # # Get list of children
+    # if root.is_nominal:
+    #     # root.children is a dictionary
+    #     children = [val for val in root.children.values()]
+    # else:
+    #     # root.children is a pair
+    #     children = root.children
 
-    # Consider each node for pruning
-    for node in children:
-        pruned_tree = deepcopy(node)
+    # # Consider each node for pruning
+    # for node in children:
+    #     pruned_tree = deepcopy(node)
 
-        # Remove the subtree at that node, make it a leaf, and assign the most common class at that node
-        mode_class = node.label
+    #     # Remove the subtree at that node, make it a leaf, and assign the most common class at that node
+    #     mode_class = node.label
 
-        leaf = Node()
-        leaf.label = mode_class
+    #     leaf = Node()
+    #     leaf.label = mode_class
 
-        # For each subtree, we replace it with a leaf node labeled with the training instances covered by the subtree (appropriately for classification or regression).
+    #     # For each subtree, we replace it with a leaf node labeled with the training instances covered by the subtree (appropriately for classification or regression).
 
 
-    # Prune if the resulting tree performs no worse then the original on the validation set
-    original_cci = validation_accuracy(root, validation_set)
-    test_cci = validation_accuracy(test_tree, validation_set)
-    if test_cci >= original_cci:
+    # # Prune if the resulting tree performs no worse then the original on the validation set
+    # original_cci = validation_accuracy(root, validation_set)
+    # test_cci = validation_accuracy(test_tree, validation_set)
+    # if test_cci >= original_cci:
         
-        # If the leaf node does not perform worse than the subtree on the pruning set, we prune the subtree and keep the leaf node because the additional complexity of the subtree is not justified; otherwise, we keep the subtree.
+    #     # If the leaf node does not perform worse than the subtree on the pruning set, we prune the subtree and keep the leaf node because the additional complexity of the subtree is not justified; otherwise, we keep the subtree.
     
-    # Nodes are removed iteratively choosing the node whose removal most increases the decision tree accuracy on the graph
+    # # Nodes are removed iteratively choosing the node whose removal most increases the decision tree accuracy on the graph
 
-    # Pruning continues until further pruning is harmful
+    # # Pruning continues until further pruning is harmful
+    pass
 
 
 def validation_accuracy(tree,validation_set):

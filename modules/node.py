@@ -41,7 +41,32 @@ class Node:
         '''
         given a single observation, will return the output of the tree
         '''
-        pass 
+
+        if type(self.label) is int:
+            return self.label
+
+        else:
+            attr = self.decision_attribute
+            instance_val = instance[attr]
+
+            try:
+                if self.is_nominal:
+                    next = self.children["instance_val"]
+                else:
+                    # Node is numerical
+                    if instance_val < self.splitting_value:
+                        next = self.children[0]
+                    else:
+                        # Instance value is >= splitting value
+                        next = self.children[1]
+
+                return next.classify(instance)
+
+            except (IndexError, KeyError):
+                return self.mode
+
+            
+
 
     def print_tree(self, indent = 0):
         '''
@@ -78,11 +103,19 @@ class Node:
 
 if __name__ == "__main__":
     import os; path = "/Users/sarah/git/id3-decision-tree/modules"; os.chdir(path)
+    # attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
+    # data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
+    # numerical_splits_count = [5, 5]
+
+    # test = ID3(data_set, attribute_metadata, numerical_splits_count, 10)
+    # print "Output tree:"
+    # test.print_tree()
+
     attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
     data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
-    numerical_splits_count = [5, 5]
+    numerical_splits_count = [1, 1]
+    n = ID3(data_set, attribute_metadata, numerical_splits_count, 5)
 
-    test = ID3(data_set, attribute_metadata, numerical_splits_count, 10)
-    print "Output tree:"
-    test.print_tree()
+    print [n.classify(x) == x[0] for x in data_set]
+
     # pprint(vars(test))
