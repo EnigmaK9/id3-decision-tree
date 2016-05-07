@@ -6,15 +6,18 @@
 #            For numeric, the 0 index holds examples < the splitting_value, the 
 #            index holds examples >= the splitting value
 #
-# label - is None if there is a decision attribute, and is the output label (0 or 1 for
-#	the homework data set) if there are no other attributes
-#       to split on or the data is homogenous
+# label - is None if there is a decision attribute,
+#         and is the output label (0 or 1 for
+#	      the homework data set) if there are no other attributes
+#         to split on or the data is homogenous
 #
 # decision_attribute - the index of the decision attribute being split on
 #
 # is_nominal - is the decision attribute nominal
 #
-# value - Ignore (not used, output class if any goes in label)
+# value - if label None -> None
+#         if label 0    -> mode
+#         if label 1    -> homogenous value
 #
 # splitting_value - if numeric, where to split
 #
@@ -35,8 +38,7 @@ class Node:
         '''
         given a single observation, will return the output of the tree
         '''
-	# Your code here
-	pass
+        pass 
 
     def print_tree(self, indent = 0):
         '''
