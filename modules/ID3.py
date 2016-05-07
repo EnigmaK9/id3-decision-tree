@@ -22,37 +22,27 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     """
 
     tree = Node()
-
-    # If dataset empty, return None
-    if not data_set:
-        raise Exception("Dataset empty")
-
-    # Always store the mode in the tree.mode field
-    # This is distinct from tree.label, which should be None
-    # if we end up splitting on an attribute
     tree.mode = mode(data_set)
     
     # If dataset is homogenous, tree is a leaf node
     homogenous = check_homogenous(data_set)
 
     if homogenous:
-        tree.label = 1
-        tree.value = homogenous
+        tree.label = homogenous
 
     # If any of the following are true, tree is a leaf with mode classification:
     # - Max depth reached
     # - Splits on all nominal attributes yield zero information gain
     # - No numerical splits left
+    # Return mode classification
     attr, threshold = pick_best_attribute(data_set, attribute_metadata, numerical_splits_count)
 
     if (depth == 0 or not attr):
-        # Return ZeroR classification
-        tree.label = 0
-        tree.value = mode(data_set)
+        tree.label = mode(data_set)
     
-    # pick_best_attribute returned an attribute, so we split
+    # Otherwise, pick_best_attribute returned an attribute, so we split
     else:
-        tree.decision_attrib = attr  # index of the attribute in attribute_metadata
+        tree.decision_attrib = attr  # index of the attribute
         tree.name = attribute_metadata[attr]["name"]
         tree.is_nominal = attribute_metadata[attr]["is_nominal"]
         tree.splitting_value = threshold  # Will be False if nominal
@@ -86,7 +76,6 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
 
     return tree
 
-    # pass
 
 
 def check_homogenous(data_set):
@@ -286,60 +275,45 @@ def gain_ratio_numeric(data_set, attribute, steps=1):
 
 
 def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
-    '''
-    Input:  A data_set, attribute_metadata, splits counts for numeric
+    """Picks the attribute that maximizes information gain ratio.
+    
+    If attribute is numeric, return best split value.
+    If attribute is nominal, split value is False.
+    If gain ratio of all the attributes is 0, then return False, False.
+    Only consider numeric splits for which numerical_splits_count is greater than zero.
+    
+    Arguments:
+        data_set {List of Examples}
+        attribute_metadata {List of Dictionaries}
+        numerical_splits_count {List of Ints} -- remaining splits for numeric variables
+    
+    Returns: one of the following
+        {Int, Float} -- index of best attribute in the attribute_metadata list, split threshold if attribute is numeric
+        {Int, False} -- index of best attribute in the attribute_metadata list, False if attribute is nominal
+        {False, False} -- if no best attribute exists
+    """
 
-    Job:    Find the attribute that maximizes the gain ratio. If attribute is numeric return best split value.
-            If nominal, then split value is False.
-            If gain ratio of all the attributes is 0, then return False, False
-            Only consider numeric splits for which numerical_splits_count is greater than zero
+    result = False, False
+    igr_max = 0
 
-    Output: index of best attribute in the attribute_metadata list, split value if numeric
-    '''
-    # Your code here
+    # Only consider attributes whose numerical_splits_count value is > 0
+    # Enumerate from attribute_metadata[1:] to skip the classification attribute
+    for i, a in enumerate(attribute_metadata[1:]):
+        i += 1  # Reset i to account for skipping classification attribute
+        if a["is_nominal"]:
+            igr = gain_ratio_nominal(data_set, i)
+            t = False
+        elif numerical_splits_count[i] > 0:
+            igr, t = gain_ratio_numeric(data_set, i, steps=1)
+        
+        if igr > igr_max:
+            igr_max = igr  # Update internal counter
+            result = i, t
 
-    # Get indices of all numerical attributes
-    # numerical_attrib_indices = [i for attrib, i in enumerate(attribute_metadata) if not attrib["is_nominal"]]
-
-    # find best attribute
-    best_attri = 0
-    splitValue = False
-    max_gain_ratio = 0
-
-    for attribute in range(1,len(data_set[0])):
-        if attribute_metadata[attribute]['is_nominal']:
-            gain_ratio = gain_ratio_nominal(data_set, attribute)
-            numerical_splits_count[attribute] -= 1
-        else:
-            if numerical_splits_count[attribute] > 0:
-                gain_ratio = gain_ratio_numeric(data_set, attribute, 1)[0]
-                numerical_splits_count[attribute] -= 1
-        if gain_ratio > max_gain_ratio:
-            best_attri = attribute
-            max_gain_ratio = gain_ratio
-            if attribute_metadata[attribute]['is_nominal']:
-                splitValue = False    
-            else:
-                splitValue = gain_ratio_numeric(data_set, attribute, 1)[1]
-    if max_gain_ratio == 0:
-        return False, False
-    return best_attri, splitValue
-    pass
-
-# # ======== Test Cases =============================
-# numerical_splits_count = [20,20]
-# attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
-# data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [0, 0.51], [1, 0.4]]
-# pick_best_attribute(data_set, attribute_metadata, numerical_splits_count) == (1, 0.51)
-# attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "weather",'is_nominal': True}]
-# data_set = [[0, 0], [1, 0], [0, 2], [0, 2], [0, 3], [1, 1], [0, 4], [0, 2], [1, 2], [1, 5]]
-# pick_best_attribute(data_set, attribute_metadata, numerical_splits_count) == (1, False)
-
-# Uses gain_ratio_nominal or gain_ratio_numeric to calculate gain ratio.
+    return result
 
 
 if __name__ == "__main__":
-
     # Tests for check_homogenous
     data_set = [[0],[1],[1],[1],[1],[1]]
     assert(check_homogenous(data_set) == None)
@@ -397,11 +371,24 @@ if __name__ == "__main__":
     assert gain_ratio_numeric(data_set,attr,step) == (0.23645279766002802, 0.29)
     print "Passed tests for gain_ratio_numeric"
 
+    # Tests for pick_best_attribute
+    numerical_splits_count = [20,20]
+    attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
+    data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [0, 0.51], [1, 0.4]]
+    assert pick_best_attribute(data_set, attribute_metadata, numerical_splits_count) == (1, 0.51)
+    attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "weather",'is_nominal': True}]
+    data_set = [[0, 0], [1, 0], [0, 2], [0, 2], [0, 3], [1, 1], [0, 4], [0, 2], [1, 2], [1, 5]]
+    assert pick_best_attribute(data_set, attribute_metadata, numerical_splits_count) == (1, False)
+    print "Passed tests for pick_best_attribute"
+
     # Tests for ID3
     attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
     data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
     numerical_splits_count = [5, 5]
 
-    # ID3(data_set, attribute_metadata, numerical_splits_count, 10)
+    test = ID3(data_set, attribute_metadata, numerical_splits_count, 10)
+    print "\n"
+    test.print_tree()
+    # print "Passed tests for ID3"
 
     print "All tests passed"
