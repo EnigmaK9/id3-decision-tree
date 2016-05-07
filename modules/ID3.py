@@ -88,6 +88,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
 
     # pass
 
+
 def check_homogenous(data_set):
     """Checks if a dataset has a homogenous output classification.
     
@@ -108,6 +109,186 @@ def check_homogenous(data_set):
             return None
 
     return value
+
+
+def mode(data_set):
+    """Returns the mode of index 0 for a given dataset.
+    
+    Arguments:
+        data_set {List of Examples}
+    
+    Returns:
+        {Int} -- 0 or 1, the mode of index 0
+    """
+
+    counts = [0, 0]
+
+    for x in data_set:
+        categorical = x[0]
+        counts[categorical] += 1
+
+    return int(not counts[0] > counts[1])
+
+
+def entropy(data_set):
+    """Calculates the Shannon entropy of a dataset for the binary attribute at the 0th index.
+    
+    Arguments:
+        data_set {[List of Examples]} -- list of examples given as lists of attribute values, where the 0th attribute is the classification
+
+    Returns:
+        {Float} entropy of the attribute
+    """
+
+    # Compute the probability of each outcome
+    total_examples = len(data_set)
+    pos_examples = len([x for x in data_set if x[0] == 1])
+    neg_examples = len([x for x in data_set if x[0] == 0])
+
+    # Catch empty partitions
+    if total_examples == 0 or pos_examples == 0:
+        pr_pos = 0
+    else:
+        pr_pos = float(pos_examples) / float(total_examples)
+
+    if total_examples == 0 or neg_examples == 0:
+        pr_neg = 0
+    else:
+        pr_neg = float(neg_examples) / float(total_examples)
+
+    # Compute the entropy over each event in the sample space
+    entropy_pos = -pr_pos * math.log(pr_pos, 2) if pr_pos > 0.0 else 0
+    entropy_neg = -pr_neg * math.log(pr_neg, 2) if pr_neg > 0.0 else 0
+
+    return entropy_pos + entropy_neg
+
+
+def split_on_nominal(data_set, attribute):
+    '''
+    Input:  subset of data set, the index for a nominal attribute.
+    Job:    Creates a dictionary of all values of the attribute.
+    Output: Dictionary of all values pointing to a list of all the data with that attribute
+    '''
+    # partition is a dictionary of pairs (value, subset)
+    partition = {}
+
+    # Get range of possible attribute values
+    values = {x[attribute] for x in data_set}
+
+    for value in values:
+        partition[value] = [x for x in data_set if x[attribute] == value]
+
+    return partition
+
+
+def split_on_numerical(data_set, attribute, splitting_value):
+    '''
+    Input: Subset of data set, the index for a numeric attribute, threshold (splitting) value
+
+    Job: Splits data_set into a tuple of two lists,
+            - the first list contains the examples where the given attribute has value less than the splitting value,
+            - the second list contains the other examples.
+
+    Output: Tuple of two lists as described above
+    '''
+
+    examples_below = [x for x in data_set if x[attribute] < splitting_value]
+    examples_above = [x for x in data_set if x[attribute] >= splitting_value]
+
+    return examples_below, examples_above
+
+
+def gain_ratio_nominal(data_set, attribute):
+    """Compute the information gain ratio for splitting over a nominal variable.
+    
+    Arguments:
+        data_set {List of Examples}
+        attribute {Int} -- index of a nominal attribute
+
+    Returns:
+        {Float} -- the gain ratio
+    """
+    
+    current_entropy = entropy(data_set)
+    total_examples = len(data_set)
+    partition = split_on_nominal(data_set, attribute)
+    entropy_after = 0
+    intrinsic_value = 0
+
+    # Compute info gain and intrinsic value of test over all attribute values
+    for subset in partition.values():
+        if total_examples > 0:
+            p = len(subset) / float(total_examples)  # Probability an example will have this this attribute value
+            entropy_after += p * entropy(subset)
+
+            # Compute partial intrinsic value
+            iv = -p * math.log(p, 2)
+            intrinsic_value += iv
+
+    info_gain = current_entropy - entropy_after
+    if intrinsic_value > 0:
+        gain_ratio = info_gain / float(intrinsic_value)
+    else:
+        gain_ratio = 0
+
+    return gain_ratio
+
+
+def gain_ratio_numeric(data_set, attribute, steps):
+    '''
+    Input:  Subset of data set, the index for a numeric attribute, and a step size for normalizing the data.
+
+    Job:    Calculate the gain_ratio_numeric and find the best single threshold value
+            The threshold will be used to split examples into two sets
+                 those with attribute value GREATER THAN OR EQUAL TO threshold
+                 those with attribute value LESS THAN threshold
+            Use the equation here: https://en.wikipedia.org/wiki/Information_gain_ratio
+            And restrict your search for possible thresholds to examples with array index mod(step) == 0
+
+    Output: This function returns the gain ratio and threshold value
+    '''
+    # Accumulate (gain_ratio, threshold) pairs for optimization
+    pairs = []
+
+    # Sort the data_set by value for attribute
+    # sorted_data = deepcopy(data_set)
+    # sorted_data.sort(key=lambda x: x[attribute])
+
+    current_entropy = entropy(data_set)
+    total_examples = len(data_set)
+
+    # Iterate through sorted dataset, trying every step-th value
+    # as a threshold, and computing the information gain at this threshold
+    for i in xrange(0, total_examples, steps):
+        threshold = data_set[i][attribute]
+        partition = split_on_numerical(data_set, attribute, threshold)
+
+        entropy_after = 0
+        intrinsic_value = 0
+
+        for subset in partition:
+            if len(subset) > 0:
+                p = len(subset) / float(total_examples)  # Probability an example will have this this attribute value
+                entropy_after += p * entropy(subset)
+
+                # Compute partial intrinsic value
+                iv = -p * math.log(p, 2)
+                intrinsic_value += iv
+
+        if intrinsic_value > 0:
+            info_gain = current_entropy - entropy_after
+            gain_ratio = info_gain / float(intrinsic_value)
+        else:
+            gain_ratio = 0
+
+        pair = gain_ratio, threshold
+        pairs.append(pair)
+    
+
+    # Return the (gain_ratio, threshold) pair with the highest IGR
+    result = max(pairs, key=lambda x: x[0])
+    return result
+
 
 def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
     '''
@@ -161,161 +342,6 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
 
 # Uses gain_ratio_nominal or gain_ratio_numeric to calculate gain ratio.
 
-def mode(data_set):
-    '''
-    Input:  A data_set
-
-    Job:    Takes a data_set and finds mode of index 0.
-
-    Output: mode of index 0.
-    '''
-
-    counts = [0, 0]
-
-    for x in data_set:
-        categorical = x[0]
-        counts[categorical] += 1
-
-    return int(not counts[0] > counts[1])
-
-def entropy(data_set):
-    """Calculates the Shannon entropy of a dataset for the binary attribute at the 0th index.
-    
-    Arguments:
-        data_set {[List of Examples]} -- list of examples given as lists of attribute values, where the 0th attribute is the classification
-
-    Returns:
-        {Float} entropy of the attribute
-    """
-
-    # Compute the probability of each outcome
-    total_examples = len(data_set)
-    pos_examples = len([x for x in data_set if x[0] == 1])
-    neg_examples = len([x for x in data_set if x[0] == 0])
-
-    pr_pos = float(pos_examples) / float(total_examples)
-    pr_neg = float(neg_examples) / float(total_examples)
-
-    # Compute the entropy over each event in the sample space
-    entropy_pos = -pr_pos * math.log(pr_pos, 2) if pr_pos > 0.0 else 0
-    entropy_neg = -pr_neg * math.log(pr_neg, 2) if pr_neg > 0.0 else 0
-
-    return round(entropy_pos + entropy_neg, 3)
-
-
-def gain_ratio_nominal(data_set, attribute):
-    """Compute the information gain ratio for splitting over a nominal variable.
-    
-    Arguments:
-        data_set {List of Examples}
-        attribute {Int} -- index of a nominal attribute
-
-    Returns:
-        {Float} -- the gain ratio
-    """
-    
-    current_entropy = entropy(data_set)
-    partition = split_on_nominal(data_set, attribute)
-    entropy_after = 0
-    intrinsic_value = 0
-
-    # Compute info gain and intrinsic value of test over all attribute values
-    for subset in partition.values():
-        p = len(subset) / float(len(data_set))  # Probability an example will have this this attribute value
-        entropy_after += p * entropy(subset)
-
-        # Compute partial intrinsic value
-        iv = -p * math.log(p, 2) if p > 0.0 else 0
-        intrinsic_value += iv
-
-    info_gain = current_entropy - entropy_after
-    gain_ratio = info_gain / float(intrinsic_value)
-
-    return gain_ratio
-
-# ======== Test case =============================
-# data_set, attr = [[1, 2], [1, 0], [1, 0], [0, 2], [0, 2], [0, 0], [1, 3], [0, 4], [0, 3], [1, 1]], 1
-# gain_ratio_nominal(data_set,attr) == 0.11470666361703151
-# data_set, attr = [[1, 2], [1, 2], [0, 4], [0, 0], [0, 1], [0, 3], [0, 0], [0, 0], [0, 4], [0, 2]], 1
-# gain_ratio_nominal(data_set,attr) == 0.2056423328155741
-# data_set, attr = [[0, 3], [0, 3], [0, 3], [0, 4], [0, 4], [0, 4], [0, 0], [0, 2], [1, 4], [0, 4]], 1
-# gain_ratio_nominal(data_set,attr) == 0.06409559743967516
-
-def gain_ratio_numeric(data_set, attribute, steps):
-    '''
-    Input:  Subset of data set, the index for a numeric attribute, and a step size for normalizing the data.
-
-    Job:    Calculate the gain_ratio_numeric and find the best single threshold value
-            The threshold will be used to split examples into two sets
-                 those with attribute value GREATER THAN OR EQUAL TO threshold
-                 those with attribute value LESS THAN threshold
-            Use the equation here: https://en.wikipedia.org/wiki/Information_gain_ratio
-            And restrict your search for possible thresholds to examples with array index mod(step) == 0
-
-    Output: This function returns the gain ratio and threshold value
-    '''
-    gain_ratio = 0
-    splitValue = 0
-    
-    for i in range(0, len(data_set)):
-        if i % steps == 0:
-            threshold = data_set[i][attribute]
-            tu = split_on_numerical(data_set, attribute, threshold)
-            #avoid changing the original split tuple
-            tu = copy.deepcopy(tu)
-            for smaller in tu[0]:
-                smaller[attribute] = 1
-            for greater in tu[1]:
-                greater[attribute] = 2
-            newArr = tu[0] + tu[1]
-            
-            currRatio = gain_ratio_nominal(newArr, attribute) 
-            #print currRatio
-            if currRatio > gain_ratio:
-                gain_ratio = currRatio
-                splitValue = threshold
-        
-    return gain_ratio, splitValue
-# ======== Test case =============================
-# data_set,attr,step = [[1,0.05], [1,0.17], [1,0.64], [0,0.38], [1,0.19], [1,0.68], [1,0.69], [1,0.17], [1,0.4], [0,0.53]], 1, 2
-# gain_ratio_numeric(data_set,attr,step) == (0.31918053332474033, 0.64)
-# data_set,attr,step = [[1, 0.35], [1, 0.24], [0, 0.67], [0, 0.36], [1, 0.94], [1, 0.4], [1, 0.15], [0, 0.1], [1, 0.61], [1, 0.17]], 1, 4
-# gain_ratio_numeric(data_set,attr,step) == (0.11689800358692547, 0.94)
-# data_set,attr,step = [[1, 0.1], [0, 0.29], [1, 0.03], [0, 0.47], [1, 0.25], [1, 0.12], [1, 0.67], [1, 0.73], [1, 0.85], [1, 0.25]], 1, 1
-# gain_ratio_numeric(data_set,attr,step) == (0.23645279766002802, 0.29)
-
-def split_on_nominal(data_set, attribute):
-    '''
-    Input:  subset of data set, the index for a nominal attribute.
-    Job:    Creates a dictionary of all values of the attribute.
-    Output: Dictionary of all values pointing to a list of all the data with that attribute
-    '''
-    # partition is a dictionary of pairs (value, subset)
-    partition = {}
-
-    # Get range of possible attribute values
-    values = {x[attribute] for x in data_set}
-
-    for value in values:
-        partition[value] = [x for x in data_set if x[attribute] == value]
-
-    return partition
-
-def split_on_numerical(data_set, attribute, splitting_value):
-    '''
-    Input: Subset of data set, the index for a numeric attribute, threshold (splitting) value
-
-    Job: Splits data_set into a tuple of two lists,
-            - the first list contains the examples where the given attribute has value less than the splitting value,
-            - the second list contains the other examples.
-
-    Output: Tuple of two lists as described above
-    '''
-
-    examples_below = [x for x in data_set if x[attribute] < splitting_value]
-    examples_above = [x for x in data_set if x[attribute] >= splitting_value]
-
-    return examples_below, examples_above
 
 if __name__ == "__main__":
 
@@ -356,6 +382,7 @@ if __name__ == "__main__":
     assert entropy(data_set) == 1.0
     data_set = [[0],[0],[0],[0],[0],[0],[0],[0]]
     assert entropy(data_set) == 0
+    print "Passed tests for entropy"
 
     # Tests for gain_ratio_nominal
     data_set, attr = [[1, 2], [1, 0], [1, 0], [0, 2], [0, 2], [0, 0], [1, 3], [0, 4], [0, 3], [1, 1]], 1
@@ -364,6 +391,16 @@ if __name__ == "__main__":
     assert gain_ratio_nominal(data_set,attr) == 0.2056423328155741
     data_set, attr = [[0, 3], [0, 3], [0, 3], [0, 4], [0, 4], [0, 4], [0, 0], [0, 2], [1, 4], [0, 4]], 1
     assert gain_ratio_nominal(data_set,attr) == 0.06409559743967516
+    print "Passed tests for gain_ratio_nominal"
+
+    # Tests for gain_ratio_numeric
+    data_set,attr,step = [[0,0.05], [1,0.17], [1,0.64], [0,0.38], [0,0.19], [1,0.68], [1,0.69], [1,0.17], [1,0.4], [0,0.53]], 1, 2
+    assert gain_ratio_numeric(data_set,attr,step) == (0.31918053332474033, 0.64)
+    data_set,attr,step = [[1, 0.35], [1, 0.24], [0, 0.67], [0, 0.36], [1, 0.94], [1, 0.4], [1, 0.15], [0, 0.1], [1, 0.61], [1, 0.17]], 1, 4
+    assert gain_ratio_numeric(data_set,attr,step) == (0.11689800358692547, 0.94)
+    data_set,attr,step = [[1, 0.1], [0, 0.29], [1, 0.03], [0, 0.47], [1, 0.25], [1, 0.12], [1, 0.67], [1, 0.73], [1, 0.85], [1, 0.25]], 1, 1
+    assert gain_ratio_numeric(data_set,attr,step) == (0.23645279766002802, 0.29)
+    print "Passed tests for gain_ratio_numeric"
 
     # Tests for ID3
     attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
