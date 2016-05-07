@@ -212,11 +212,13 @@ def gain_ratio_nominal(data_set, attribute):
     current_entropy = entropy(data_set)
     total_examples = len(data_set)
     partition = split_on_nominal(data_set, attribute)
+    
+    # Compute info gain and intrinsic value of test over all attribute values
     entropy_after = 0
     intrinsic_value = 0
 
-    # Compute info gain and intrinsic value of test over all attribute values
     for subset in partition.values():
+        # If split is pure, partial IG and IV will be 0
         if total_examples > 0:
             p = len(subset) / float(total_examples)  # Probability an example will have this this attribute value
             entropy_after += p * entropy(subset)
@@ -226,47 +228,45 @@ def gain_ratio_nominal(data_set, attribute):
             intrinsic_value += iv
 
     info_gain = current_entropy - entropy_after
-    if intrinsic_value > 0:
-        gain_ratio = info_gain / float(intrinsic_value)
-    else:
-        gain_ratio = 0
+    igr = info_gain / float(intrinsic_value) if intrinsic_value > 0 else 0
 
-    return gain_ratio
+    return igr
 
 
-def gain_ratio_numeric(data_set, attribute, steps):
-    '''
-    Input:  Subset of data set, the index for a numeric attribute, and a step size for normalizing the data.
+def gain_ratio_numeric(data_set, attribute, steps=1):
+    """Compute the gain ratio for splitting on a numeric attribute.
+    
+    Finds the threshold value yielding the highest gain ratio.
+    Threshold value partitions the data_set into two subsets, those with attribute value < threshold, and those >= threshold
+    Checks every ith example in the data_set, where i denotes the step value
+    
+    Arguments:
+        data_set {List of Examples}
+        attribute {Int} -- index of numeric attribute in an example
+    
+    Keyword Arguments:
+        steps {Int} -- denotes the number of values to skip when iterating through data_set (default: {1})
 
-    Job:    Calculate the gain_ratio_numeric and find the best single threshold value
-            The threshold will be used to split examples into two sets
-                 those with attribute value GREATER THAN OR EQUAL TO threshold
-                 those with attribute value LESS THAN threshold
-            Use the equation here: https://en.wikipedia.org/wiki/Information_gain_ratio
-            And restrict your search for possible thresholds to examples with array index mod(step) == 0
-
-    Output: This function returns the gain ratio and threshold value
-    '''
-    # Accumulate (gain_ratio, threshold) pairs for optimization
-    pairs = []
-
-    # Sort the data_set by value for attribute
-    # sorted_data = deepcopy(data_set)
-    # sorted_data.sort(key=lambda x: x[attribute])
+    Returns:
+        {Float, Float} -- gain ratio and threshold value
+    """
 
     current_entropy = entropy(data_set)
     total_examples = len(data_set)
 
+    igr_max = 0, 0
+
     # Iterate through sorted dataset, trying every step-th value
-    # as a threshold, and computing the information gain at this threshold
     for i in xrange(0, total_examples, steps):
         threshold = data_set[i][attribute]
         partition = split_on_numerical(data_set, attribute, threshold)
 
+        # Compute the information gain at this threshold
         entropy_after = 0
         intrinsic_value = 0
 
         for subset in partition:
+            # If the split is pure, partial IV and IG will be 0
             if len(subset) > 0:
                 p = len(subset) / float(total_examples)  # Probability an example will have this this attribute value
                 entropy_after += p * entropy(subset)
@@ -275,19 +275,14 @@ def gain_ratio_numeric(data_set, attribute, steps):
                 iv = -p * math.log(p, 2)
                 intrinsic_value += iv
 
-        if intrinsic_value > 0:
             info_gain = current_entropy - entropy_after
-            gain_ratio = info_gain / float(intrinsic_value)
-        else:
-            gain_ratio = 0
+            igr = info_gain / float(intrinsic_value) if intrinsic_value > 0 else 0
 
-        pair = gain_ratio, threshold
-        pairs.append(pair)
+        # Update max if necessary
+        if igr > igr_max[0]:
+            igr_max = igr, threshold
     
-
-    # Return the (gain_ratio, threshold) pair with the highest IGR
-    result = max(pairs, key=lambda x: x[0])
-    return result
+    return igr_max
 
 
 def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
