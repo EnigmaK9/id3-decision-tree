@@ -179,7 +179,7 @@ def mode(data_set):
     return int(not counts[0] > counts[1])
 
 def entropy(data_set):
-    """Calculates the Shannon entropy of a dataset for the attribute at the 0th index.
+    """Calculates the Shannon entropy of a dataset for the binary attribute at the 0th index.
     
     Arguments:
         data_set {[List of Examples]} -- list of examples given as lists of attribute values, where the 0th attribute is the classification
@@ -203,52 +203,35 @@ def entropy(data_set):
     return round(entropy_pos + entropy_neg, 3)
 
 
-def actualEntropy(data_set):
-    # Your code here
-    firstNum = []
-    for li in data_set:
-        #print li
-        firstNum.append(li[0])
-
-    # number of unique values in the list
-    unique = set(firstNum)
-    probabilities = []
-    for num in unique:
-        probabilities.append(firstNum.count(num))
-    #total occurences of numbers in the list
-    total = len(firstNum)
-    result = 0
-    for probability in probabilities:
-        probability = float(probability)/float(total)
-        result += -probability * math.log(probability, 2)
-    return result
-
-
 def gain_ratio_nominal(data_set, attribute):
-    '''
-    Input:  Subset of data_set, index for a nominal attribute
-    Job:    Finds the gain ratio of a nominal attribute in relation to the variable we are training on.
-    Output: Returns gain_ratio. See https://en.wikipedia.org/wiki/Information_gain_ratio
-    '''
-    # get entropy of the data_set
-    entropyVal = actualEntropy(data_set)
-    # sort the data_set based on the attribute
-    # [[1, 0], [1, 0], [0,0], [1,1], [1,2], [0,2], [0,2], [1,3], [0,3], [0,4]]
-    total = len(data_set)
-    ig = 0
-    iv = 0
-    sumVal = 0
-    dic = split_on_nominal(data_set, attribute)
-    for key in dic.keys():
-        proportion = float(len(dic[key])) / float(total)
-        sumVal += proportion * entropy(dic[key])
-        iv += proportion * math.log(proportion, 2);
-    ig = entropyVal - sumVal
-    iv = -iv
-    if iv == 0:
-        return 0
-    result = float(ig)/float(iv) 
-    return result
+    """Compute the information gain ratio for splitting over a nominal variable.
+    
+    Arguments:
+        data_set {List of Examples}
+        attribute {Int} -- index of a nominal attribute
+
+    Returns:
+        {Float} -- the gain ratio
+    """
+    
+    current_entropy = entropy(data_set)
+    partition = split_on_nominal(data_set, attribute)
+    entropy_after = 0
+    intrinsic_value = 0
+
+    # Compute info gain and intrinsic value of test over all attribute values
+    for subset in partition.values():
+        p = len(subset) / float(len(data_set))  # Probability an example will have this this attribute value
+        entropy_after += p * entropy(subset)
+
+        # Compute partial intrinsic value
+        iv = -p * math.log(p, 2) if p > 0.0 else 0
+        intrinsic_value += iv
+
+    info_gain = current_entropy - entropy_after
+    gain_ratio = info_gain / float(intrinsic_value)
+
+    return gain_ratio
 
 # ======== Test case =============================
 # data_set, attr = [[1, 2], [1, 0], [1, 0], [0, 2], [0, 2], [0, 0], [1, 3], [0, 4], [0, 3], [1, 1]], 1
@@ -335,6 +318,7 @@ def split_on_numerical(data_set, attribute, splitting_value):
     return examples_below, examples_above
 
 if __name__ == "__main__":
+
     # Tests for check_homogenous
     data_set = [[0],[1],[1],[1],[1],[1]]
     assert(check_homogenous(data_set) == None)
@@ -368,12 +352,18 @@ if __name__ == "__main__":
     # Tests for entropy
     data_set = [[0],[1],[1],[1],[0],[1],[1],[1]]
     assert round(entropy(data_set), 3) == 0.811
-
     data_set = [[0],[0],[1],[1],[0],[1],[1],[0]]
     assert entropy(data_set) == 1.0
-
     data_set = [[0],[0],[0],[0],[0],[0],[0],[0]]
     assert entropy(data_set) == 0
+
+    # Tests for gain_ratio_nominal
+    data_set, attr = [[1, 2], [1, 0], [1, 0], [0, 2], [0, 2], [0, 0], [1, 3], [0, 4], [0, 3], [1, 1]], 1
+    assert gain_ratio_nominal(data_set,attr) == 0.11470666361703151
+    data_set, attr = [[1, 2], [1, 2], [0, 4], [0, 0], [0, 1], [0, 3], [0, 0], [0, 0], [0, 4], [0, 2]], 1
+    assert gain_ratio_nominal(data_set,attr) == 0.2056423328155741
+    data_set, attr = [[0, 3], [0, 3], [0, 3], [0, 4], [0, 4], [0, 4], [0, 0], [0, 2], [1, 4], [0, 4]], 1
+    assert gain_ratio_nominal(data_set,attr) == 0.06409559743967516
 
     # Tests for ID3
     attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
