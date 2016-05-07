@@ -51,7 +51,7 @@ class Node:
 
             try:
                 if self.is_nominal:
-                    next = self.children["instance_val"]
+                    next = self.children[instance_val]
                 else:
                     # Node is numerical
                     if instance_val < self.splitting_value:
@@ -117,5 +117,6 @@ if __name__ == "__main__":
     n = ID3(data_set, attribute_metadata, numerical_splits_count, 5)
 
     print [n.classify(x) == x[0] for x in data_set]
+    n.classify([1, 0.27])
 
     # pprint(vars(test))
