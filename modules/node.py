@@ -122,5 +122,50 @@ class Node:
 
         return output
         
+    def print_dnf_tree(self):
+        '''
+        returns the disjunct normalized form of the tree.
+        '''
+        return self.print_dnf_tree_helper('', '');
 
-    
+
+    def print_dnf_tree_helper(self, tmp_str, dnf_str):
+        '''
+        returns the disjunct normalized form of the tree.
+        '''
+        if self.label is not None: 
+            #only print if the end result is 1
+            if self.label == 1:
+                dnf_str += ' (' + tmp_str + ') OR '
+                tmp_str = ''
+
+        elif self.is_nominal: 
+            for key in self.children.iterkeys():
+                
+                if tmp_str == '':
+                    # get the current split criteria
+                    self.children[key].print_dnf_tree_helper(self.name + ' = ' + str(self.children[key].name), dnf_str)
+                else:
+                    self.children[key].print_dnf_tree_helper(tmp_str + ' ^ ' + self.name + ' = ' + str(self.children[key].name), dnf_str)
+        
+        else:
+            if tmp_str == '':
+                self.children[0].print_dnf_tree_helper(self.name + ' < ' + str(self.splitting_value), dnf_str)
+                self.children[1].print_dnf_tree_helper(self.name + ' >= ' + str(self.splitting_value), dnf_str)
+            else:
+                if len(self.children) == 2:
+                    self.children[0].print_dnf_tree_helper(tmp_str + ' AND ' + self.name + ' < ' + str(self.splitting_value), dnf_str)
+                    self.children[1].print_dnf_tree_helper(tmp_str + ' AND ' + self.name + ' >= ' + str(self.splitting_value), dnf_str)
+
+
+        return dnf_str
+
+
+
+
+
+
+
+
+
+ 
