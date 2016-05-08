@@ -1,2 +1,364 @@
 
-CLASS: 1
+numinjured < 1.000000
+
+|    oppnuminjured < 1.000000
+
+|    |    CLASS: 1
+|    oppnuminjured >= 1.000000
+
+|    |    CLASS: 0
+numinjured >= 1.000000
+
+|    oppnuminjured < 4.000000
+
+|    |    temperature < 48.446671
+
+|    |    |    CLASS: 0
+|    |    temperature >= 48.446671
+
+|    |    |    rundifferential < 120.000000
+
+|    |    |    |    opprundifferential < 106.000000
+
+|    |    |    |    |    oppwinningpercent < 0.195530
+
+|    |    |    |    |    |    oppwinningpercent < 0.009730
+
+|    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    oppwinningpercent >= 0.009730
+
+|    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    oppwinningpercent >= 0.195530
+
+|    |    |    |    |    |    oppnuminjured < 1.491569
+
+|    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    oppnuminjured >= 1.491569
+
+|    |    |    |    |    |    |    numinjured < 1.543722
+
+|    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    numinjured >= 1.543722
+
+|    |    |    |    |    |    |    |    homeaway: 0
+
+|    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    oppstartingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    homeaway: 1
+
+|    |    |    |    |    |    |    |    |    oppstartingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    oppstartingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    oppstartingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 0
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    oppstartingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    oppstartingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 1
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 2
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 3
+
+|    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 4
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    startingpitcher: 5
+
+|    |    |    |    |    |    |    |    |    |    |    weather: 0
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: 1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    |    |    |    |    |    |    |    weather: -1
+
+|    |    |    |    |    |    |    |    |    |    |    |    CLASS: 1
+|    |    |    |    opprundifferential >= 106.000000
+
+|    |    |    |    |    CLASS: 0
+|    |    |    rundifferential >= 120.000000
+
+|    |    |    |    CLASS: 0
+|    oppnuminjured >= 4.000000
+
+|    |    CLASS: 0

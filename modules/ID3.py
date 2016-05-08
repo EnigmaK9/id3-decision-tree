@@ -46,12 +46,14 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
         tree.is_nominal = attribute_metadata[attr]["is_nominal"]
         tree.splitting_value = threshold  # Will be False if nominal
 
+        patched_data = handle_missing(data_set, attribute_metadata, attr)
+
         # Handle splitting on a nominal attribute
         if tree.is_nominal:
             # children is a dictionary of pairs (value, Node)
             children = {}
 
-            partition = split_on_nominal(data_set, attr)
+            partition = split_on_nominal(patched_data, attr)
 
             for value, examples in partition.items():
                 children[value] = ID3(examples, attribute_metadata, numerical_splits_count, depth - 1)
@@ -61,7 +63,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
             # children is a list of two nodes [< t, >= t] for split threshold t
             children = []
 
-            partition_below, partition_above = split_on_numerical(data_set, attr, threshold)
+            partition_below, partition_above = split_on_numerical(patched_data, attr, threshold)
 
             # Attribute is numeric, so we decrement its index in numerical_splits_count
             new_splits_count = numerical_splits_count
@@ -297,7 +299,11 @@ def attribute_mode(data_set, attribute):
                 values[a] = [x]
 
     # Return the value with the most instance matches among the dataset
-    mode = max(values.items(), key=lambda x: len(x[1]))[0]
+    try:
+        mode = max(values.items(), key=lambda x: len(x[1]))[0]
+    except (ValueError):
+        # Just assign "None"
+        mode = None
 
     return mode
 
@@ -394,10 +400,6 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
         if igr > igr_max:
             igr_max = igr  # Update internal counter
             result = i, t
-
-    if result[0]:
-        # Replace the dataset with the patched one
-        data_set = patched_data
 
     return result
 
