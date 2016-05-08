@@ -98,24 +98,46 @@ class Node:
         returns a string of the entire tree in human readable form
         '''
 
+        # pre = "|    " * indent
+
+        # # If node is a leaf, simply print output class
+        # if self.label is not None:
+        #     print pre + "CLASS: " + str(self.label)
+
+        # # Otherwise, print attribute split information
+        # else:
+        #     if self.is_nominal:
+        #         for val, child in self.children.items():
+        #             print "%s%s: %s" % (pre, self.name, val)
+        #             child.print_tree(indent + 1)
+        #     else:
+        #         # Node is numerical
+        #         print "%s%s < %f" % (pre, self.name, self.splitting_value)
+        #         self.children[0].print_tree(indent + 1)
+        #         print "%s%s >= %f" % (pre, self.name, self.splitting_value)
+        #         self.children[1].print_tree(indent + 1)
+
         pre = "|    " * indent
+        output = ""
 
         # If node is a leaf, simply print output class
         if self.label is not None:
-            print pre + "CLASS: " + str(self.label)
+            output += "\n" + pre + "CLASS: " + str(self.label)
 
         # Otherwise, print attribute split information
         else:
             if self.is_nominal:
                 for val, child in self.children.items():
-                    print "%s%s: %s" % (pre, self.name, val)
-                    child.print_tree()
+                    output += "\n" + "%s%s: %s" % (pre, self.name, val)
+                    output += "\n" + child.print_tree(indent + 1)
             else:
                 # Node is numerical
-                print "%s%s < %f" % (pre, self.name, self.splitting_value)
-                self.children[0].print_tree(indent + 1)
-                print "%s%s >= %f" % (pre, self.name, self.splitting_value)
-                self.children[1].print_tree(indent + 1)
+                output += "\n" + "%s%s < %f" % (pre, self.name, self.splitting_value)
+                output += "\n" + self.children[0].print_tree(indent + 1)
+                output += "\n" + "%s%s >= %f" % (pre, self.name, self.splitting_value)
+                output += "\n" + self.children[1].print_tree(indent + 1)
+
+        return output
         
 
     def print_dnf_tree(self):

@@ -1,7 +1,7 @@
 import math
 from node import Node
 import sys
-import copy
+from copy import deepcopy
 
 def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     """Recursively trains a binary classification decision tree, using Quinlan's ID3 algorithm.
@@ -9,24 +9,25 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     Recursively chooses the most significant attribute as the root of the subtree.
     
     Arguments:
-        data_set {List of Examples} -- a two-dimensional list of examples, where each example is a sequence of attribute values
-        attribute_metadata {List of Dicts} -- a list of attribute dictionaries, each with a name and type field
-        numerical_splits_count {List of Ints} -- a list of integers ordered corresponding to the attribute_metadata order, representing the number of remaining splits allowed for each numerical attribute
-        depth {Int} -- maximum depth to search to (depth = 0 indicates that this node should output a label)
+    data_set {List of Examples} -- a two-dimensional list of examples, where each example is a sequence of attribute values
+    attribute_metadata {List of Dicts} -- a list of attribute dictionaries, each with a name and type field
+    numerical_splits_count {List of Ints} -- a list of integers ordered corresponding to the attribute_metadata order, representing the number of remaining splits allowed for each numerical attribute
+    depth {Int} -- maximum depth to search to (depth = 0 indicates that this node should output a label)
     
     Returns:
-        Node -- the root of the decision tree learned over the given data set
+    Node -- the root of the decision tree learned over the given data set
     
     Raises:
-        Exception -- if given dataset is empty
+    Exception -- if given dataset is empty
     """
 
     tree = Node()
     tree.mode = mode(data_set)
     
-    # If dataset is homogenous, tree is a leaf node
     homogenous = check_homogenous(data_set)
+    attr, threshold = pick_best_attribute(data_set, attribute_metadata, numerical_splits_count)
 
+    # If dataset is homogenous, tree is a leaf node
     if homogenous:
         tree.label = homogenous
 
@@ -35,9 +36,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     # - Splits on all nominal attributes yield zero information gain
     # - No numerical splits left
     # Return mode classification
-    attr, threshold = pick_best_attribute(data_set, attribute_metadata, numerical_splits_count)
-
-    if (depth == 0 or not attr):
+    elif (depth == 0 or not attr):
         tree.label = mode(data_set)
     
     # Otherwise, pick_best_attribute returned an attribute, so we split
@@ -77,17 +76,16 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     return tree
 
 
-
 def check_homogenous(data_set):
     """Checks if a dataset has a homogenous output classification.
-    
+
     Checks if the attribute at index 0 for each example is the same for all examples in the data set.
-    
+
     Arguments:
-        data_set {List of Examples} -- list of examples given as lists of attribute values
+    data_set {List of Examples} -- list of examples given as lists of attribute values
 
     Returns:
-        either the homogenous attribute or None
+    either the homogenous attribute or None
     """
 
     # Get the classification of the first example
@@ -102,12 +100,12 @@ def check_homogenous(data_set):
 
 def mode(data_set):
     """Returns the mode of index 0 for a given dataset.
-    
+
     Arguments:
-        data_set {List of Examples}
-    
+    data_set {List of Examples}
+
     Returns:
-        {Int} -- 0 or 1, the mode of index 0
+    {Int} -- 0 or 1, the mode of index 0
     """
 
     counts = [0, 0]
@@ -121,12 +119,12 @@ def mode(data_set):
 
 def entropy(data_set):
     """Calculates the Shannon entropy of a dataset for the binary attribute at the 0th index.
-    
+
     Arguments:
-        data_set {[List of Examples]} -- list of examples given as lists of attribute values, where the 0th attribute is the classification
+    data_set {[List of Examples]} -- list of examples given as lists of attribute values, where the 0th attribute is the classification
 
     Returns:
-        {Float} entropy of the attribute
+    {Float} entropy of the attribute
     """
 
     # Compute the probability of each outcome
@@ -158,6 +156,7 @@ def split_on_nominal(data_set, attribute):
     Job:    Creates a dictionary of all values of the attribute.
     Output: Dictionary of all values pointing to a list of all the data with that attribute
     '''
+
     # partition is a dictionary of pairs (value, subset)
     partition = {}
 
@@ -175,8 +174,8 @@ def split_on_numerical(data_set, attribute, splitting_value):
     Input: Subset of data set, the index for a numeric attribute, threshold (splitting) value
 
     Job: Splits data_set into a tuple of two lists,
-            - the first list contains the examples where the given attribute has value less than the splitting value,
-            - the second list contains the other examples.
+    - the first list contains the examples where the given attribute has value less than the splitting value,
+    - the second list contains the other examples.
 
     Output: Tuple of two lists as described above
     '''
@@ -189,19 +188,19 @@ def split_on_numerical(data_set, attribute, splitting_value):
 
 def gain_ratio_nominal(data_set, attribute):
     """Compute the information gain ratio for splitting over a nominal variable.
-    
+
     Arguments:
-        data_set {List of Examples}
-        attribute {Int} -- index of a nominal attribute
+    data_set {List of Examples}
+    attribute {Int} -- index of a nominal attribute
 
     Returns:
-        {Float} -- the gain ratio
+    {Float} -- the gain ratio
     """
-    
+
     current_entropy = entropy(data_set)
     total_examples = len(data_set)
     partition = split_on_nominal(data_set, attribute)
-    
+
     # Compute info gain and intrinsic value of test over all attribute values
     entropy_after = 0
     intrinsic_value = 0
@@ -224,20 +223,20 @@ def gain_ratio_nominal(data_set, attribute):
 
 def gain_ratio_numeric(data_set, attribute, steps=1):
     """Compute the gain ratio for splitting on a numeric attribute.
-    
+
     Finds the threshold value yielding the highest gain ratio.
     Threshold value partitions the data_set into two subsets, those with attribute value < threshold, and those >= threshold
     Checks every ith example in the data_set, where i denotes the step value
-    
+
     Arguments:
-        data_set {List of Examples}
-        attribute {Int} -- index of numeric attribute in an example
-    
+    data_set {List of Examples}
+    attribute {Int} -- index of numeric attribute in an example
+
     Keyword Arguments:
-        steps {Int} -- denotes the number of values to skip when iterating through data_set (default: {1})
+    steps {Int} -- denotes the number of values to skip when iterating through data_set (default: {1})
 
     Returns:
-        {Float, Float} -- gain ratio and threshold value
+    {Float, Float} -- gain ratio and threshold value
     """
 
     current_entropy = entropy(data_set)
@@ -264,33 +263,114 @@ def gain_ratio_numeric(data_set, attribute, steps=1):
                 iv = -p * math.log(p, 2)
                 intrinsic_value += iv
 
-        info_gain = current_entropy - entropy_after
-        igr = info_gain / float(intrinsic_value) if intrinsic_value > 0 else 0
+                info_gain = current_entropy - entropy_after
+                igr = info_gain / float(intrinsic_value) if intrinsic_value > 0 else 0
 
         # Update max if necessary
         if igr > igr_max[0]:
             igr_max = igr, threshold
-    
+
     return igr_max
+
+
+def attribute_mode(data_set, attribute):
+    """Returns the mode value of an attribute among a subset of examples.
+
+    Arguments:
+    data_set {List of Examples}
+    attribute {Int} -- the index of the attribute of interest
+
+    Returns:
+    {String} -- the attribute value with the most instance matches
+    """
+
+    # Use a dictionary to keep track of attribute values
+    values = {}
+
+    for x in data_set:
+        a = x[attribute]
+        if a is not None:
+            if a in values.keys():
+                values[a].append(x)
+            else:
+                # Add value to dictionary
+                values[a] = [x]
+
+    # Return the value with the most instance matches among the dataset
+    mode = max(values.items(), key=lambda x: len(x[1]))[0]
+
+    return mode
+
+
+def attribute_mean(data_set, attribute):
+    """Computes the mean value for a given attribute among examples in the data set.
+
+    Arguments:
+    data_set {List of Examples}
+    attribute {Int} -- the index of the attribute of interest
+
+    Returns:
+    {Float} -- the average attribute value
+    """
+
+    filtered_data = [x for x in data_set if x[attribute] is not None]
+
+    if filtered_data:
+        s = sum([x[attribute] for x in filtered_data])
+        mean = s / float(len(filtered_data))
+    else:
+        mean = 0
+
+    return mean
+
+
+def handle_missing(data_set, attribute_metadata, attribute):
+    """Handles missing attribute values in dataset.
+
+    For a nominal attribute, assigns the most common attribute value among examples in the dataset.
+    For a numerical attribute, assigns the weighted average attribute value among examples in the
+
+    Arguments:
+    data_set {List of Examples}
+    attribute_metadata {List of Dictionaries}
+    attribute {Int} -- the index of the attribute of interest
+
+    Returns:
+    {List of Examples} -- a deepcopy of the dataset with missing attribute replaced accordingly
+    """
+
+    replaced_data = deepcopy(data_set)
+
+    if attribute_metadata[attribute]["is_nominal"]:
+        replacement = attribute_mode(data_set, attribute)
+    else:
+    # Attribute is numerical, so substitute the mean
+        replacement = attribute_mean(data_set, attribute)
+
+    for x in replaced_data:
+        if x[attribute] is None:
+            x[attribute] = replacement
+
+    return replaced_data
 
 
 def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
     """Picks the attribute that maximizes information gain ratio.
-    
+
     If attribute is numeric, return best split value.
     If attribute is nominal, split value is False.
     If gain ratio of all the attributes is 0, then return False, False.
     Only consider numeric splits for which numerical_splits_count is greater than zero.
-    
+
     Arguments:
-        data_set {List of Examples}
-        attribute_metadata {List of Dictionaries}
-        numerical_splits_count {List of Ints} -- remaining splits for numeric variables
-    
+    data_set {List of Examples}
+    attribute_metadata {List of Dictionaries}
+    numerical_splits_count {List of Ints} -- remaining splits for numeric variables
+
     Returns: one of the following
-        {Int, Float} -- index of best attribute in the attribute_metadata list, split threshold if attribute is numeric
-        {Int, False} -- index of best attribute in the attribute_metadata list, False if attribute is nominal
-        {False, False} -- if no best attribute exists
+    {Int, Float} -- index of best attribute in the attribute_metadata list, split threshold if attribute is numeric
+    {Int, False} -- index of best attribute in the attribute_metadata list, False if attribute is nominal
+    {False, False} -- if no best attribute exists
     """
 
     result = False, False
@@ -300,17 +380,24 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
     # Enumerate from attribute_metadata[1:] to skip the classification attribute
     for i, a in enumerate(attribute_metadata[1:]):
         i += 1  # Reset i to account for skipping classification attribute
+        patched_data = handle_missing(data_set, attribute_metadata, i)
         if a["is_nominal"]:
-            igr = gain_ratio_nominal(data_set, i)
+            igr = gain_ratio_nominal(patched_data, i)
             t = False
         elif numerical_splits_count[i] > 0:
-            igr, t = gain_ratio_numeric(data_set, i, steps=1)
+            # Attribute is numerical, check if splits count is > 0
+            igr, t = gain_ratio_numeric(patched_data, i, steps=1)
         else:
+            # Attribute is numerical and no splits remain, so we skip it
             continue
-        
+
         if igr > igr_max:
             igr_max = igr  # Update internal counter
             result = i, t
+
+    if result[0]:
+        # Replace the dataset with the patched one
+        data_set = patched_data
 
     return result
 
