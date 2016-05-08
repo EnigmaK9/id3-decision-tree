@@ -33,7 +33,7 @@ def reduced_error_pruning(root, training_set, validation_set):
             children = root.children
 
         for c in children:
-            reduced_error_pruning(child, training_set, validation_set)
+            reduced_error_pruning(c, training_set, validation_set)
 
     accuracy = validation_accuracy(root, validation_set)
     

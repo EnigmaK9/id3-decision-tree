@@ -1,4 +1,3 @@
-from ID3 import *
 from pprint import pprint
 
 # DOCUMENTATION

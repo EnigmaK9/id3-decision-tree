@@ -54,7 +54,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
 
             partition = split_on_nominal(data_set, attr)
 
-            for value, examples in partition:
+            for value, examples in partition.items():
                 children[value] = ID3(examples, attribute_metadata, numerical_splits_count, depth - 1)
 
         # Handle splitting on a numerical attribute
