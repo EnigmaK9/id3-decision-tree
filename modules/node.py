@@ -33,16 +33,43 @@ class Node:
         self.splitting_value = None
         self.children = {}
         self.name = None
+        self.saved_children = None
 
     def __str__(self):
         return str(self.label)
+
+    def make_leaf(self):
+        if self.label is None:
+            self.label = self.mode
+            self.saved_children = self.children
+            self.children = {}
+
+    def make_fork(self):
+        if self.label is not None:
+            self.label = None
+            self.children = self.saved_children
+            self.saved_children = {}
+
+    def num_nodes(self):
+        acc = 1
+        if self.children:
+            if self.is_nominal:
+                children = self.children.values()
+            else:
+                children = self.children
+
+            for c in children:
+                acc += c.num_nodes()
+
+        return acc
 
     def classify(self, instance):
         '''
         given a single observation, will return the output of the tree
         '''
 
-        if type(self.label) is int:
+        # If node is a leaf, return classification
+        if self.label is not None:
             return self.label
 
         else:
@@ -62,10 +89,9 @@ class Node:
 
                 return next.classify(instance)
 
+            # Catch missing attribute values, etc.
             except (IndexError, KeyError):
                 return self.mode
-
-            
 
 
     def print_tree(self, indent = 0):
@@ -93,7 +119,6 @@ class Node:
                 self.children[1].print_tree(indent + 1)
         
 
-
     def print_dnf_tree(self):
         '''
         returns the disjunct normalized form of the tree.
@@ -116,7 +141,8 @@ if __name__ == "__main__":
     numerical_splits_count = [1, 1]
     n = ID3(data_set, attribute_metadata, numerical_splits_count, 5)
 
-    print [n.classify(x) == x[0] for x in data_set]
-    n.classify([1, 0.27])
+    n.print_tree()
+
+    print n.num_nodes()
 
     # pprint(vars(test))
