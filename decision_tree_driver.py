@@ -12,12 +12,14 @@ from modules.predictions import *
 
 options = {
     'train' : 'data/test_btrain.csv',
+    # 'train' : 'data/btrain.csv',
     'validate': 'data/test_bvalidate.csv',
+    # 'validate': 'data/bvalidate.csv',
     'predict': 'data/test_btest.csv',
     'limit_splits_on_numerical': 5,
     'limit_depth': 20,
     'print_tree': True,
-    'print_dnf' : False,
+    'print_dnf' : True,
     'prune' : 'data/test_bvalidate.csv',
     # 'prune': False,
     'learning_curve' : {
@@ -77,6 +79,9 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
     # test tree accuracy on validation set
     if validate != False:
         print '###\n#  Validating\n###'
+        train_set, _ = parse(train, False)
+        accuracy = validation_accuracy(tree, train_set)
+        print "Accuracy on training set: " + str(accuracy)
         validate_set, _ = parse(validate, False)
         accuracy = validation_accuracy(tree,validate_set)
         print "Accuracy on validation set: " + str(accuracy)

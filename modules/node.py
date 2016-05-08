@@ -65,9 +65,9 @@ class Node:
         return acc
 
     def classify(self, instance):
-        '''
+        """
         given a single observation, will return the output of the tree
-        '''
+        """
 
         # If node is a leaf, return classification
         if self.label is not None:
@@ -96,9 +96,9 @@ class Node:
 
 
     def print_tree(self, indent = 0):
-        '''
+        """
         returns a string of the entire tree in human readable form
-        '''
+        """
 
         pre = "|    " * indent
         output = ""
@@ -123,30 +123,4 @@ class Node:
         return output
         
 
-    def print_dnf_tree(self):
-        '''
-        returns the disjunct normalized form of the tree.
-        '''
-        pass
-
-
-if __name__ == "__main__":
-    import os; path = "/Users/sarah/git/id3-decision-tree/modules"; os.chdir(path)
-    # attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
-    # data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
-    # numerical_splits_count = [5, 5]
-
-    # test = ID3(data_set, attribute_metadata, numerical_splits_count, 10)
-    # print "Output tree:"
-    # test.print_tree()
-
-    attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
-    data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
-    numerical_splits_count = [1, 1]
-    n = ID3(data_set, attribute_metadata, numerical_splits_count, 5)
-
-    n.print_tree()
-
-    print n.num_nodes()
-
-    # pprint(vars(test))
+    
