@@ -1,7 +1,6 @@
 from node import Node
 from ID3 import *
 from operator import xor
-from copy import deepcopy
 
 # Note, these functions are provided for your reference.  You will not be graded on their behavior,
 # so you can implement them as you choose or not implement them at all if you want to use a different
@@ -10,7 +9,7 @@ from copy import deepcopy
 def reduced_error_pruning(root, training_set, validation_set):
     """Reduced error pruning for a trained ID3 decision tree.
     
-    Removes nodes such that doing so improves validation accuracy.
+    Greedily removes nodes to improve validation accuracy.
     
     Arguments:
         root {Node} -- root node of decision tree learned over the training set
@@ -21,7 +20,7 @@ def reduced_error_pruning(root, training_set, validation_set):
         Node -- the improved root of the pruned decision tree
     """
 
-    # Generate a list of nodes
+    # Build list of nodes by traversing breadth first
     nodes = [root]
     for n in nodes:
         if n.children:
@@ -88,22 +87,3 @@ def validation_accuracy(tree,validation_set):
 
     accuracy = accurate_instances / float(total_instances)
     return accuracy
-
-
-if __name__ == "__main__":
-    attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
-    data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
-    numerical_splits_count = [5, 5]
-    n = ID3(data_set, attribute_metadata, numerical_splits_count, 5)
-    res = [n.classify(x) == x[0] for x in data_set]
-    assert validation_accuracy(n, data_set) == 10 / float(11)
-
-    # Tests for ID3
-    attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
-    data_set = [[1, 0.27], [0, 0.42], [0, 0.86], [0, 0.68], [0, 0.04], [1, 0.01], [1, 0.33], [1, 0.42], [1, 0.42], [0, 0.51], [1, 0.4]]
-    numerical_splits_count = [5, 5]
-
-    test = ID3(data_set, attribute_metadata, numerical_splits_count, 10)
-    print "\n"
-    print test.print_tree()
-    print reduced_error_pruning(test)

@@ -46,6 +46,7 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
     # call the ID3 classification algorithm with the appropriate options
     tree = ID3(train_set, attribute_metadata, numerical_splits_count, depth)
     print '\n'
+    print "Nodes before pruning: " + str(tree.num_nodes())
 
     # call reduced error pruning using the pruning set
     if prune != False:
@@ -53,8 +54,7 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
         pruning_set, _ = parse(prune, False)
         reduced_error_pruning(tree,train_set,pruning_set)
         print ''
-
-    print "Num nodes: " + str(tree.num_nodes())
+        print "Nodes after pruning: " + str(tree.num_nodes())
 
     # print tree visually
     if print_tree:

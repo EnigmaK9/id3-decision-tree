@@ -1,27 +1,32 @@
 from pprint import pprint
 
-# DOCUMENTATION
-# =====================================
-# Class node attributes:
-# ----------------------------
-# children - a list of 2 if numeric and a dictionary if nominal.  
-#            For numeric, the 0 index holds examples < the splitting_value, the 
-#            index holds examples >= the splitting value
-#
-# label - is the output label (0 or 1) if there are no other attributes to split on, or the data is homogenous
-#         if there is a decision attribute, use mode
-#
-# decision_attribute - the index of the decision attribute being split on
-#
-# is_nominal - is the decision attribute nominal
-#
-# value - Ignore (not used, output class if any goes in label)
-#
-# splitting_value - if numeric, where to split
-#
-# name - name of the attribute being split on
-
 class Node:
+    """A class for decision tree nodes.
+
+    Members:
+        label {Int}
+            - output label (0 or 1) if there are no other attributes to split on at this node, or if the data is homogenous
+            - mode output if there is a decision attribute
+        decision_attribute {Int}
+            - index of the attribute being split on
+            - None if leaf node
+        is_nominal {Boolean}
+            - indicates whether the attribute being split on is nominal (True) or numeric (False)
+            - None if leaf node
+        value {None} -- unused
+        mode {Int} -- mode output classification among examples sorted to this node
+        splitting_value {Float}
+            - threshold for split if attribute being split on is numeric
+            - None if leaf node, or splitting on nominal attribute
+        children {List or Dictionary}
+            - a list of 2 if numeric, with 0 index holding examples < splitting_value and 1 index holding examples >= splitting_value
+            - a dictionary of "value": [subset] pairs if nominal
+            - None if leaf node
+        name {String}
+            - name of the attribute being split on
+            - None if leaf node
+    """
+
     def __init__(self):
         # initialize all attributes
         self.label = None
@@ -33,9 +38,6 @@ class Node:
         self.children = {}
         self.name = None
         self.saved_children = None
-
-    def __str__(self):
-        return str(self.label)
 
     def make_leaf(self):
         if self.label is None:
@@ -98,44 +100,25 @@ class Node:
         returns a string of the entire tree in human readable form
         '''
 
-        # pre = "|    " * indent
-
-        # # If node is a leaf, simply print output class
-        # if self.label is not None:
-        #     print pre + "CLASS: " + str(self.label)
-
-        # # Otherwise, print attribute split information
-        # else:
-        #     if self.is_nominal:
-        #         for val, child in self.children.items():
-        #             print "%s%s: %s" % (pre, self.name, val)
-        #             child.print_tree(indent + 1)
-        #     else:
-        #         # Node is numerical
-        #         print "%s%s < %f" % (pre, self.name, self.splitting_value)
-        #         self.children[0].print_tree(indent + 1)
-        #         print "%s%s >= %f" % (pre, self.name, self.splitting_value)
-        #         self.children[1].print_tree(indent + 1)
-
         pre = "|    " * indent
         output = ""
 
         # If node is a leaf, simply print output class
         if self.label is not None:
-            output += "\n" + pre + "CLASS: " + str(self.label)
+            output += pre + "CLASS: " + str(self.label) + "\n"
 
         # Otherwise, print attribute split information
         else:
             if self.is_nominal:
                 for val, child in self.children.items():
-                    output += "\n" + "%s%s: %s" % (pre, self.name, val)
-                    output += "\n" + child.print_tree(indent + 1)
+                    output += "%s%s: %s" % (pre, self.name, val) + "\n"
+                    output += child.print_tree(indent + 1)
             else:
                 # Node is numerical
-                output += "\n" + "%s%s < %f" % (pre, self.name, self.splitting_value)
-                output += "\n" + self.children[0].print_tree(indent + 1)
-                output += "\n" + "%s%s >= %f" % (pre, self.name, self.splitting_value)
-                output += "\n" + self.children[1].print_tree(indent + 1)
+                output += "%s%s < %f" % (pre, self.name, self.splitting_value) + "\n"
+                output += self.children[0].print_tree(indent + 1)
+                output += "%s%s >= %f" % (pre, self.name, self.splitting_value) + "\n"
+                output += self.children[1].print_tree(indent + 1)
 
         return output
         
