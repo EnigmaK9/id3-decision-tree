@@ -22,6 +22,7 @@ def reduced_error_pruning(root, training_set, validation_set):
     while len(nodes) > 0:
         n = nodes.pop()
         
+        # Check if n is a fork
         if n.label is None:
             # Temporarily make it a leaf to compute validation accuracy
             n.make_leaf()
@@ -36,12 +37,14 @@ def reduced_error_pruning(root, training_set, validation_set):
                 # Permanently make the node a leaf
                 n.make_leaf()
                 continue
-
-        if n.children:
-            if n.is_nominal:
-                nodes.extend(x for x in n.children.values())
             else:
-                nodes.extend(x for x in n.children)
+                try:
+                    if n.is_nominal:
+                        nodes.extend(x for x in n.children.values())
+                    else:
+                        nodes.extend(x for x in n.children)
+                except (KeyError, IndexError):
+                    print "No children found something's probably wrong"
 
     return root
 
