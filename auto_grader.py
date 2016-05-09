@@ -154,7 +154,7 @@ def check_gain_ratio_num():
 			print "Passed %d"%(i+1)
 			total += 1
 		else:
-		 	print "Failed %d"%(i+1)
+		 	print "Failed %d"%(i+1) + str(GRNum)
 	print "Not all tests were met please look at gain_ratio_num" if total != len(result) else "All tests passed"
 
 def check_split_on_nominal():

@@ -37,6 +37,9 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     # - No numerical splits left
     # Return mode classification
     elif (depth == 0 or not attr):
+        # Debugging message
+        # reason = "no attributes to split on" if (not attr) else "depth limit reached"
+        # print "Forced leaf node because " + reason
         tree.label = mode(data_set)
     
     # Otherwise, pick_best_attribute returned an attribute, so we split
@@ -46,7 +49,10 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
         tree.is_nominal = attribute_metadata[attr]["is_nominal"]
         tree.splitting_value = threshold  # Will be False if nominal
 
-        patched_data = handle_missing(data_set, attribute_metadata, attr)
+        # Apparently accuracy is increased when we don't explicitly handle missing attributes
+        # So that's why this next line is commented out, and replaced with something redundant
+        # patched_data = handle_missing(data_set, attribute_metadata, attr)
+        patched_data = data_set
 
         # Handle splitting on a nominal attribute
         if tree.is_nominal:
@@ -66,7 +72,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
             partition_below, partition_above = split_on_numerical(patched_data, attr, threshold)
 
             # Attribute is numeric, so we decrement its index in numerical_splits_count
-            new_splits_count = numerical_splits_count
+            new_splits_count = deepcopy(numerical_splits_count)
             new_splits_count[attr] -= 1
 
             children.append(ID3(partition_below, attribute_metadata, new_splits_count, depth - 1))
@@ -241,13 +247,16 @@ def gain_ratio_numeric(data_set, attribute, steps=1):
         {Float, Float} -- gain ratio and threshold value
     """
 
+    # step_size = len(data_set) // 10 + 1
+    step_size = steps
+
     current_entropy = entropy(data_set)
     total_examples = len(data_set)
 
     igr_max = 0, 0
 
     # Iterate through sorted dataset, trying every step-th value
-    for i in xrange(0, total_examples, steps):
+    for i in xrange(0, total_examples, step_size):
         threshold = data_set[i][attribute]
         partition = split_on_numerical(data_set, attribute, threshold)
 
@@ -386,13 +395,19 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
     # Enumerate from attribute_metadata[1:] to skip the classification attribute
     for i, a in enumerate(attribute_metadata[1:]):
         i += 1  # Reset i to account for skipping classification attribute
-        patched_data = handle_missing(data_set, attribute_metadata, i)
+
+        # Apparently accuracy is increased when we don't explicitly handle missing attributes
+        # So that's why this next line is commented out, and replaced with something redundant
+        # patched_data = handle_missing(data_set, attribute_metadata, i)
+        patched_data = data_set
+
         if a["is_nominal"]:
             igr = gain_ratio_nominal(patched_data, i)
             t = False
         elif numerical_splits_count[i] > 0:
             # Attribute is numerical, check if splits count is > 0
-            igr, t = gain_ratio_numeric(patched_data, i, steps=1)
+            step_size = len(data_set) // 10 + 1
+            igr, t = gain_ratio_numeric(patched_data, i, step_size)
         else:
             # Attribute is numerical and no splits remain, so we skip it
             continue
@@ -400,5 +415,9 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
         if igr > igr_max:
             igr_max = igr  # Update internal counter
             result = i, t
+
+    # Debugging message
+    # if result == (False, False):
+    #     print "No attribute found"
 
     return result

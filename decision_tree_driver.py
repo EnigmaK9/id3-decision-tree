@@ -11,16 +11,16 @@ from modules.predictions import *
 #   options can be found in README.md
 
 options = {
-    'train' : 'data/test_btrain.csv',
-    # 'train' : 'data/btrain.csv',
-    'validate': 'data/test_bvalidate.csv',
-    # 'validate': 'data/bvalidate.csv',
-    'predict': 'data/test_btest.csv',
-    'limit_splits_on_numerical': 5,
-    'limit_depth': 20,
+    # 'train' : 'data/test_btrain.csv',
+    'train' : 'data/btrain.csv',
+    # 'validate': 'data/test_bvalidate.csv',
+    'validate': 'data/bvalidate.csv',
+    'predict': 'data/btest.csv',
+    'limit_splits_on_numerical': 20,
+    'limit_depth': 30,
     'print_tree': True,
     'print_dnf' : True,
-    'prune' : 'data/test_bvalidate.csv',
+    'prune' : 'data/bvalidate.csv',
     # 'prune': False,
     'learning_curve' : {
         'upper_bound' : 0.05,
@@ -43,12 +43,18 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
     else:
         depth = float("inf")
 
+    print "limit_depth: " + str(limit_depth)
+    print "limit_splits_on_numerical: " + str(limit_splits_on_numerical)
+
     print "###\n#  Training Tree\n###"
 
     # call the ID3 classification algorithm with the appropriate options
     tree = ID3(train_set, attribute_metadata, numerical_splits_count, depth)
     print '\n'
     print "Nodes before pruning: " + str(tree.num_nodes())
+    train_set, _ = parse(train, False)
+    accuracy = validation_accuracy(tree, train_set)
+    print "Accuracy on training set: " + str(accuracy)
 
     # call reduced error pruning using the pruning set
     if prune != False:
