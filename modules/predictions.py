@@ -31,11 +31,12 @@ def create_predictions(tree, predict):
         writer = csv.writer(csvfile, delimiter=",")
 
         # Write attribute names
-        fieldnames = [attr["name"] for attr in attribute_metadata]
+        fieldnames = [attr["name"] for attr in attribute_metadata[1:]]
+        fieldnames.append("winner")  # Place at end
         writer.writerow(fieldnames)
 
         for x in data_set:
-            x[0] = tree.classify(x)
-            writer.writerow(x)
+            x.append(tree.classify(x))
+            writer.writerow(x[1:])
 
     print "CSV written to file"

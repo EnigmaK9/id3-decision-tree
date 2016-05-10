@@ -1,4 +1,5 @@
 from pprint import pprint
+from copy import deepcopy
 
 class Node:
     """A class for decision tree nodes.
@@ -126,46 +127,30 @@ class Node:
         '''
         returns the disjunct normalized form of the tree.
         '''
-        return self.print_dnf_tree_helper('', '');
+        self.print_dnf_tree_helper()
 
-
-    def print_dnf_tree_helper(self, tmp_str, dnf_str):
-        '''
-        returns the disjunct normalized form of the tree.
-        '''
-        if self.label is not None: 
-            #only print if the end result is 1
+    def print_dnf_tree_helper(self,lineage=[]):
+        new_lineage = deepcopy(lineage)
+        if self.label is not None:
             if self.label == 1:
-                dnf_str += ' (' + tmp_str + ') OR '
-                tmp_str = ''
-
-        elif self.is_nominal: 
-            for key in self.children.iterkeys():
-                
-                if tmp_str == '':
-                    # get the current split criteria
-                    self.children[key].print_dnf_tree_helper(self.name + ' = ' + str(self.children[key].name), dnf_str)
-                else:
-                    self.children[key].print_dnf_tree_helper(tmp_str + ' ^ ' + self.name + ' = ' + str(self.children[key].name), dnf_str)
-        
+                print "(",
+                for name in new_lineage[:-1]:
+                    print str(name) + " AND",
+                print new_lineage[-1] + " )"
+                print "OR"
         else:
-            if tmp_str == '':
-                self.children[0].print_dnf_tree_helper(self.name + ' < ' + str(self.splitting_value), dnf_str)
-                self.children[1].print_dnf_tree_helper(self.name + ' >= ' + str(self.splitting_value), dnf_str)
+            if not self.is_nominal:
+                new_lineage1 = deepcopy(lineage)
+                new_lineage1.append(str(self.name) + " < " + str(self.splitting_value))
+                if new_lineage1 is not None:
+                    self.children[0].print_dnf_tree_helper(new_lineage1)
+                new_lineage2 = deepcopy(lineage)
+                new_lineage2.append(str(self.name) + " >= " + str(self.splitting_value))
+                if new_lineage2 is not None:
+                    self.children[1].print_dnf_tree_helper(new_lineage2)
             else:
-                if len(self.children) == 2:
-                    self.children[0].print_dnf_tree_helper(tmp_str + ' AND ' + self.name + ' < ' + str(self.splitting_value), dnf_str)
-                    self.children[1].print_dnf_tree_helper(tmp_str + ' AND ' + self.name + ' >= ' + str(self.splitting_value), dnf_str)
-
-
-        return dnf_str
-
-
-
-
-
-
-
-
-
- 
+                for key, child in self.children.iteritems():
+                    new_lineage = deepcopy(lineage)
+                    if new_lineage is not None:
+                        new_lineage.append(str(self.name) + "=" + str(key))
+                    child.print_dnf_tree_helper(new_lineage)

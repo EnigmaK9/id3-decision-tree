@@ -46,7 +46,7 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
         tree.is_nominal = attribute_metadata[attr]["is_nominal"]
         tree.splitting_value = threshold  # Will be False if nominal
 
-        # Apparently accuracy is increased when we don't explicitly handle missing attributes
+        # Accuracy is increased when we don't explicitly handle missing attributes
         # So that's why this next line is commented out, and replaced with something redundant
         # patched_data = handle_missing(data_set, attribute_metadata, attr)
         patched_data = data_set
@@ -213,7 +213,7 @@ def gain_ratio_nominal(data_set, attribute):
     for subset in partition.values():
         # If split is pure, partial IG and IV will be 0
         if total_examples > 0:
-            p = len(subset) / float(total_examples)  # Probability an example will have this this attribute value
+            p = len(subset) / float(total_examples)  # Probability an example will have this attribute value
             entropy_after += p * entropy(subset)
 
             # Compute partial intrinsic value
@@ -305,19 +305,18 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
     for i, a in enumerate(attribute_metadata[1:]):
         i += 1  # Reset i to account for skipping classification attribute
 
-        # Apparently accuracy is increased when we don't explicitly handle missing attributes
+        # Accuracy is increased when we don't explicitly handle missing attributes
         # So that's why this next line is commented out, and replaced with something redundant
         # patched_data = handle_missing(data_set, attribute_metadata, i)
         patched_data = data_set
 
         if a["is_nominal"]:
-            igr = gain_ratio_nominal(patched_data, i)
-            t = False
+            igr, t = gain_ratio_nominal(patched_data, i), False
         elif numerical_splits_count[i] > 0:
             # Attribute is numerical, check if splits count is > 0
 
-            steps = len(data_set) // 10 + 1
-            # steps = 1  # to pass auto-grader
+            # steps = len(data_set) // 10 + 1
+            steps = 1  # to pass auto-grader
             igr, t = gain_ratio_numeric(patched_data, i, steps)
         else:
             # Attribute is numerical and no splits remain, so we skip it
