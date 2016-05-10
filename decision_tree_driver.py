@@ -11,17 +11,17 @@ from modules.predictions import *
 #   options can be found in README.md
 
 options = {
-    # 'train' : 'data/test_btrain.csv',
     'train' : 'data/btrain.csv',
-    # 'validate': 'data/test_bvalidate.csv',
+    # 'train' : 'data/btrain.csv',
     'validate': 'data/bvalidate.csv',
+    # 'validate': 'data/bvalidate.csv',
     'predict': 'data/btest.csv',
-    'limit_splits_on_numerical': 20,
-    'limit_depth': 30,
+    'limit_splits_on_numerical': 5,
+    'limit_depth': 20,
     'print_tree': True,
     'print_dnf' : True,
-    'prune' : 'data/bvalidate.csv',
-    # 'prune': False,
+    # 'prune' : 'data/bvalidate.csv',
+    'prune': False,
     'learning_curve' : {
         'upper_bound' : 0.05,
         'increment' : 0.001
@@ -43,20 +43,14 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
     else:
         depth = float("inf")
 
-    print "limit_depth: " + str(limit_depth)
-    print "limit_splits_on_numerical: " + str(limit_splits_on_numerical)
-
     print "###\n#  Training Tree\n###"
 
     # call the ID3 classification algorithm with the appropriate options
     tree = ID3(train_set, attribute_metadata, numerical_splits_count, depth)
     print '\n'
     print "Nodes before pruning: " + str(tree.num_nodes())
-    train_set, _ = parse(train, False)
-    accuracy = validation_accuracy(tree, train_set)
-    print "Accuracy on training set: " + str(accuracy)
 
-    # call reduced error pruning using the pruning set
+    # # call reduced error pruning using the pruning set
     if prune != False:
         print '###\n#  Pruning\n###'
         pruning_set, _ = parse(prune, False)
@@ -77,8 +71,9 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
     if print_dnf:
         print '###\n#  Decision Tree as DNF\n###'
         cursor = open('./output/DNF.txt','w+')
-        cursor.write(tree.print_dnf_tree())
-        cursor.close()
+        print tree.print_dnf_tree()
+        # cursor.write(final)
+        # cursor.close()
         print 'Decision Tree written to /output/DNF'
         print ''
 
@@ -102,10 +97,11 @@ def decision_tree_driver(train, validate = False, predict = False, prune = False
     # generate a learning curve using the validation set
     if learning_curve and validate:
         print '###\n#  Generating Learning Curve\n###'
-        iterations = 20 # number of times to test each size
-        get_graph(train_set, attribute_metadata, validate_set, 
-            numerical_splits_count, depth, 5, 0, learning_curve['upper_bound'],
-            learning_curve['increment'])
+        iterations = 2 # number of times to test each size
+        print get_graph_data(train_set, attribute_metadata, validate_set, numerical_splits_count, iterations, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+        # get_graph(train_set, attribute_metadata, validate_set, 
+        #     numerical_splits_count, depth, 5, 0, learning_curve['upper_bound'],
+        #     learning_curve['increment'])
         print ''
 
 tree = decision_tree_driver( **options )
