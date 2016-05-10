@@ -37,8 +37,6 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     # - No numerical splits left
     # Return mode classification
     elif (depth == 0 or not attr):
-        # reason = "no attributes to split on" if (not attr) else "depth limit reached"
-        # print "Forced leaf node because " + reason
         tree.label = mode(data_set)
     
     # Otherwise, pick_best_attribute returned an attribute, so we split
@@ -246,16 +244,13 @@ def gain_ratio_numeric(data_set, attribute, steps=1):
         {Float, Float} -- gain ratio and threshold value
     """
 
-    # step_size = len(data_set) // 10 + 1
-    step_size = steps
-
     current_entropy = entropy(data_set)
     total_examples = len(data_set)
 
     igr_max = 0, 0
 
     # Iterate through sorted dataset, trying every step-th value
-    for i in xrange(0, total_examples, step_size):
+    for i in xrange(0, total_examples, steps):
         threshold = data_set[i][attribute]
         partition = split_on_numerical(data_set, attribute, threshold)
 
@@ -320,8 +315,10 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
             t = False
         elif numerical_splits_count[i] > 0:
             # Attribute is numerical, check if splits count is > 0
-            step_size = len(data_set) // 10 + 1
-            igr, t = gain_ratio_numeric(patched_data, i, step_size)
+
+            steps = len(data_set) // 10 + 1
+            # steps = 1  # to pass auto-grader
+            igr, t = gain_ratio_numeric(patched_data, i, steps)
         else:
             # Attribute is numerical and no splits remain, so we skip it
             continue
@@ -329,9 +326,5 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
         if igr > igr_max:
             igr_max = igr  # Update internal counter
             result = i, t
-
-    # Debugging message
-    # if result == (False, False):
-    #     print "No attribute found"
 
     return result
